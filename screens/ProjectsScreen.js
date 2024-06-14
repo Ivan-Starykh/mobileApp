@@ -1,15 +1,25 @@
-import * as React from "react";
-import { createStackNavigator } from "@react-navigation/stack";
-import SectionScreen from "../screens/SectionScreen";
+import React from "react";
+import styled from "styled-components/native";
+import { useNavigation } from "@react-navigation/native";
 
-const ProjectsStack = createStackNavigator();
+const ProjectScreen = () => {
+  const navigation = useNavigation();
 
-function ProjectsScreen() {
   return (
-    <ProjectsStack.Navigator screenOptions={{ headerShown: false }}>
-      <ProjectsStack.Screen name="ProjectsScreen" component={SectionScreen} />
-    </ProjectsStack.Navigator>
+    <Container>
+      <Text>Project Screen</Text>
+    </Container>
   );
-}
+};
 
-export default ProjectsScreen;
+export default ProjectScreen;
+
+const Container = styled.View`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+`;
+
+const Text = styled.Text`
+  font-size: 20px;
+`;

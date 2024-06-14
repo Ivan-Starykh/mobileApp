@@ -10,7 +10,18 @@ const inactiveColor = "#b8bece";
 
 const Tab = createBottomTabNavigator();
 
-function TabNavigator() {
+function TabNavigator({ navigation, route }) {
+  React.useEffect(() => {
+    const parent = navigation.getParent();
+    if (parent) {
+      parent.setOptions({
+        tabBarStyle: {
+          display: route.state && route.state.index === 1 ? "none" : "flex",
+        },
+      });
+    }
+  }, [navigation, route]);
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -43,8 +54,16 @@ function TabNavigator() {
         component={HomeScreen}
         options={{ headerShown: false }}
       />
-      <Tab.Screen name="Courses" component={CoursesScreen} />
-      <Tab.Screen name="Projects" component={ProjectsScreen} />
+      <Tab.Screen
+        name="Courses"
+        component={CoursesScreen}
+        options={{ headerShown: false }}
+      />
+      <Tab.Screen
+        name="Projects"
+        component={ProjectsScreen}
+        options={{ headerShown: false }}
+      />
     </Tab.Navigator>
   );
 }
