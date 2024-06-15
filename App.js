@@ -2,6 +2,8 @@ import React from "react";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import AppNavigator from "./Navigator/AppNavigator";
+import { ApolloProvider } from "@apollo/client";
+import client from "./Graphql /apolloClient";
 
 const initialState = {
   action: "",
@@ -26,9 +28,11 @@ const store = configureStore({
 });
 
 const App = () => (
-  <Provider store={store}>
-    <AppNavigator />
-  </Provider>
+  <ApolloProvider client={client}>
+    <Provider store={store}>
+      <AppNavigator />
+    </Provider>
+  </ApolloProvider>
 );
 
 export default App;
