@@ -1,30 +1,56 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components/native";
+import { Dimensions } from "react-native";
 
-const Course = (props) => (
-  <Container>
-    <Cover>
-      <Image source={props.image} />
-      <Logo sourse={props.logo} resizeMode="contain" />
-      <Subtitle>{props.subtitle}</Subtitle>
-      <Title>{props.title}</Title>
-    </Cover>
-    <Content>
-      <Avatar source={props.avatar} />
-      <Caption>{props.caption}</Caption>
-      <Author>Taught by {props.author}</Author>
-    </Content>
-  </Container>
-);
+const getCourseWidth = (screenWidth = Dimensions.get("window").width) => {
+  let cardWidth = screenWidth - 40;
+  if (screenWidth >= 768) {
+    cardWidth = (screenWidth - 60) / 2;
+  }
+  if (screenWidth >= 1024) {
+    cardWidth = (screenWidth - 80) / 3;
+  }
+  return cardWidth;
+};
+
+const Course = ({ image, logo, subtitle, title, avatar, caption, author }) => {
+  const [cardWidth, setCardWidth] = useState(getCourseWidth());
+
+  useEffect(() => {
+    const handleResize = ({ window }) => {
+      setCardWidth(getCourseWidth(window.width));
+    };
+
+    Dimensions.addEventListener("change", handleResize);
+    return () => {
+      Dimensions.removeEventListener("change", handleResize);
+    };
+  }, []);
+
+  return (
+    <Container style={{ width: cardWidth }}>
+      <Cover>
+        <Image source={image} />
+        <Logo source={logo} resizeMode="contain" />
+        <Subtitle>{subtitle}</Subtitle>
+        <Title>{title}</Title>
+      </Cover>
+      <Content>
+        <Avatar source={avatar} />
+        <Caption>{caption}</Caption>
+        <Author>{author}</Author>
+      </Content>
+    </Container>
+  );
+};
 
 export default Course;
 
 const Container = styled.View`
-  //width: 335px;
-  width: 90%;
+  width: 335px;
   height: 335px;
-  background: white;
-  margin: 10px 20px;
+  background: #fff;
+  margin: 10px 10px;
   border-radius: 14px;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
 `;
@@ -52,17 +78,9 @@ const Logo = styled.Image`
   margin-left: -24px;
 `;
 
-const Subtitle = styled.Text`
-  font-size: 15px;
-  color: white;
-  font-weight: 500;
-  text-transform: uppercase;
-  margin-left: 20px;
-`;
-
 const Title = styled.Text`
   font-size: 24px;
-  color: white;
+  color: #fff;
   font-weight: 600;
   margin-top: 4px;
   margin-bottom: 20px;
@@ -70,10 +88,18 @@ const Title = styled.Text`
   width: 170px;
 `;
 
+const Subtitle = styled.Text`
+  font-size: 15px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+  text-transform: uppercase;
+  margin-left: 20px;
+`;
+
 const Content = styled.View`
   padding-left: 62px;
-  height: 75px;
   justify-content: center;
+  height: 75px;
 `;
 
 const Avatar = styled.Image`

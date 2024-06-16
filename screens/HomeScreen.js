@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components/native";
 import Card from "../components/Card";
 import {
   Animated,
   Easing,
-  SafeAreaView,
+  Platform,
   ScrollView,
   StatusBar,
   TouchableOpacity,
@@ -17,6 +17,7 @@ import { connect } from "react-redux";
 import Avatar from "../components/Avatar";
 import { useNavigation } from "@react-navigation/native";
 import { gql, useQuery } from "@apollo/client";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const CardsQuery = gql`
   query Cards {
@@ -65,6 +66,7 @@ const fetchCardsData = async () => {
             caption
             title
             subtitle
+            content
             image {
               url
             }
@@ -88,8 +90,11 @@ function HomeScreen(props) {
   const [opacity, setOpacity] = React.useState(new Animated.Value(1));
   const [cardsData, setCardsData] = React.useState(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     StatusBar.setBarStyle("dark-content", true);
+    if (Platform.OS === "android") {
+      StatusBar.setBackgroundColor("#fff"); // Set background color for Android
+    }
   }, []);
 
   React.useEffect(() => {
@@ -127,6 +132,7 @@ function HomeScreen(props) {
         useNativeDriver: true,
       }).start();
       StatusBar.setBarStyle("dark-content", true);
+      if (Platform.OS === "android") StatusBar.setBackgroundColor("#fff"); // Reset background color for Android
     }
   };
 
@@ -168,7 +174,7 @@ function HomeScreen(props) {
                 <Logo key={index} image={logo.image} text={logo.text} />
               ))}
             </ScrollView>
-            <Subtitle>Continue Learning</Subtitle>
+            <Subtitle>{"Continue Learning".toUpperCase()}</Subtitle>
             <ScrollView
               horizontal={true}
               style={{ paddingBottom: 30 }}
@@ -194,24 +200,27 @@ function HomeScreen(props) {
                         caption={card.caption}
                         logo={{ uri: card.logo.url }}
                         subtitle={card.subtitle}
+                        content={card.content}
                       />
                     </TouchableOpacity>
                   ))}
               </CardsContainer>
             </ScrollView>
-            <Subtitle>Popular Course</Subtitle>
-            {courses.map((course, index) => (
-              <Course
-                key={index}
-                image={course.image}
-                title={course.title}
-                subtitle={course.subtitle}
-                logo={course.logo}
-                author={course.author}
-                avatar={course.avatar}
-                caption={course.caption}
-              />
-            ))}
+            <Subtitle>{"Popular Course".toUpperCase()}</Subtitle>
+            <CoursesContainer>
+              {courses.map((course, index) => (
+                <Course
+                  key={index}
+                  image={course.image}
+                  title={course.title}
+                  subtitle={course.subtitle}
+                  logo={course.logo}
+                  author={course.author}
+                  avatar={course.avatar}
+                  caption={course.caption}
+                />
+              ))}
+            </CoursesContainer>
           </ScrollView>
         </SafeAreaView>
       </AnimatedContainer>
@@ -297,6 +306,13 @@ const logos = [
 
 const CardsContainer = styled.View`
   flex-direction: row;
+  padding-left: 10px;
+`;
+
+const CoursesContainer = styled.View`
+  flex-direction: row;
+  flex-wrap: wrap;
+  padding-left: 10px;
 `;
 
 const courses = [
