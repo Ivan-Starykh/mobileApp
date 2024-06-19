@@ -40,13 +40,13 @@ class Menu extends React.Component {
   }
 
   toggleMenu = () => {
-    if (this.props.action == "openMenu") {
+    if (this.props.action === "openMenu") {
       Animated.spring(this.state.top, {
         toValue: 54,
       }).start();
     }
 
-    if (this.props.action == "closeMenu") {
+    if (this.props.action === "closeMenu") {
       Animated.spring(this.state.top, {
         toValue: screenHeight,
       }).start();
