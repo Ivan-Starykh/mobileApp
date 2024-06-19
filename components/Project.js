@@ -8,18 +8,43 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { connect } from "react-redux";
+
+// Функция mapStateToProps для получения значения action из Redux state
+function mapStateToProps(state) {
+  return {
+    action: state.action,
+  };
+}
+
+// Функция mapDispatchToProps для отправки action в Redux store
+function mapDispatchToProps(dispatch) {
+  return {
+    openCard: () => dispatch({ type: "OPEN_CARD" }),
+    closeCard: () => dispatch({ type: "CLOSE_CARD" }),
+  };
+}
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
 const tabBarHeight = 75;
 
-const Project = ({ image, title, author, text }) => {
+const Project = ({
+  image,
+  title,
+  author,
+  text,
+  canOpen,
+  openCard,
+  closeCard,
+}) => {
   const cardWidth = useRef(new Animated.Value(315)).current;
   const cardHeight = useRef(new Animated.Value(460)).current;
   const titleTop = useRef(new Animated.Value(20)).current;
   const opacity = useRef(new Animated.Value(0)).current;
 
-  const openCard = () => {
+  const handleOpenCard = () => {
+    if (!canOpen) return;
     Animated.spring(cardWidth, {
       toValue: screenWidth,
       useNativeDriver: false,
@@ -28,19 +53,13 @@ const Project = ({ image, title, author, text }) => {
       toValue: screenHeight - tabBarHeight,
       useNativeDriver: false,
     }).start();
-    Animated.spring(titleTop, {
-      toValue: 45,
-      useNativeDriver: false,
-    }).start();
-    Animated.timing(opacity, {
-      toValue: 1,
-      useNativeDriver: false,
-    }).start();
-
+    Animated.spring(titleTop, { toValue: 45, useNativeDriver: false }).start();
+    Animated.timing(opacity, { toValue: 1, useNativeDriver: false }).start();
     StatusBar.setHidden(true);
+    openCard(); // Вызов функции openCard из пропсов
   };
 
-  closeCard = () => {
+  const handleCloseCard = () => {
     Animated.spring(cardWidth, {
       toValue: 315,
       useNativeDriver: false,
@@ -49,20 +68,14 @@ const Project = ({ image, title, author, text }) => {
       toValue: 460,
       useNativeDriver: false,
     }).start();
-    Animated.spring(titleTop, {
-      toValue: 20,
-      useNativeDriver: false,
-    }).start();
-    Animated.timing(opacity, {
-      toValue: 0,
-      useNativeDriver: false,
-    }).start();
-
+    Animated.spring(titleTop, { toValue: 20, useNativeDriver: false }).start();
+    Animated.timing(opacity, { toValue: 0, useNativeDriver: false }).start();
     StatusBar.setHidden(false);
+    closeCard(); // Вызов функции closeCard из пропсов
   };
 
   return (
-    <TouchableWithoutFeedback onPress={openCard}>
+    <TouchableWithoutFeedback onPress={handleOpenCard}>
       <AnimatedContainer style={{ width: cardWidth, height: cardHeight }}>
         <Cover>
           <Image source={image} />
@@ -72,7 +85,7 @@ const Project = ({ image, title, author, text }) => {
         <Text>{text}</Text>
         <TouchableOpacity
           style={{ position: "absolute", top: 20, right: 20 }}
-          onPress={this.closeCard}
+          onPress={handleCloseCard}
         >
           <AnimatedCloseView style={{ opacity: opacity }}>
             <Ionicons name="close-sharp" size={32} color="#546bfb" />
@@ -83,7 +96,7 @@ const Project = ({ image, title, author, text }) => {
   );
 };
 
-export default Project;
+export default connect(mapStateToProps, mapDispatchToProps)(Project); // Шаг 3: Обертка компонента connect(mapStateToProps, mapDispatchToProps)
 
 const Container = styled.View`
   width: 315px;

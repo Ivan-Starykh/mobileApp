@@ -3,7 +3,16 @@ import styled from "styled-components/native";
 import { useNavigation } from "@react-navigation/native";
 import Project from "../components/Project";
 import { Animated, PanResponder } from "react-native";
+import { connect } from "react-redux";
 
+// Функция mapStateToProps для получения значения action из Redux state
+function mapStateToProps(state) {
+  return {
+    action: state.action,
+  };
+}
+
+// Функция, которая возвращает следующий индекс
 function getNextIndex(index) {
   let nextIndex = index + 1;
   if (nextIndex >= projects.length) {
@@ -12,7 +21,7 @@ function getNextIndex(index) {
   return nextIndex;
 }
 
-const ProjectScreen = () => {
+const ProjectScreen = ({ action }) => {
   const navigation = useNavigation();
   const pan = useRef(new Animated.ValueXY()).current;
   const scale = useRef(new Animated.Value(0.9)).current;
@@ -20,13 +29,21 @@ const ProjectScreen = () => {
   const thirdScale = useRef(new Animated.Value(0.8)).current;
   const thirdTranslateY = useRef(new Animated.Value(-50)).current;
   const [index, setIndex] = useState(0);
-
   const [panResponder, setPanResponder] = useState(null);
 
   useEffect(() => {
     const panResponderInstance = PanResponder.create({
-      onMoveShouldSetPanResponder: () => true,
-
+      onMoveShouldSetPanResponder: (event, gestureState) => {
+        if (gestureState.dx === 0 && gestureState.dy === 0) {
+          return false;
+        } else {
+          if (action === "openCard") {
+            return false;
+          } else {
+            return true;
+          }
+        }
+      },
       onPanResponderGrant: () => {
         Animated.spring(scale, {
           toValue: 1,
@@ -45,11 +62,9 @@ const ProjectScreen = () => {
           useNativeDriver: false,
         }).start();
       },
-
       onPanResponderMove: Animated.event([null, { dx: pan.x, dy: pan.y }], {
         useNativeDriver: false,
       }),
-
       onPanResponderRelease: () => {
         const positionY = pan.y.__getValue();
         if (positionY > 200) {
@@ -90,12 +105,14 @@ const ProjectScreen = () => {
     });
 
     setPanResponder(panResponderInstance);
-  }, [pan, scale, translateY, thirdScale, thirdTranslateY, index]);
+  }, [action, pan, scale, translateY]);
 
   return (
     <Container>
       <Animated.View
-        style={{ transform: [{ translateX: pan.x }, { translateY: pan.y }] }}
+        style={{
+          transform: [{ translateX: pan.x }, { translateY: pan.y }],
+        }}
         {...(panResponder ? panResponder.panHandlers : {})}
       >
         <Project
@@ -103,6 +120,7 @@ const ProjectScreen = () => {
           image={projects[index].image}
           author={projects[index].author}
           text={projects[index].text}
+          canOpen={true}
         />
       </Animated.View>
       <Animated.View
@@ -123,6 +141,7 @@ const ProjectScreen = () => {
           image={projects[getNextIndex(index)].image}
           author={projects[getNextIndex(index)].author}
           text={projects[getNextIndex(index)].text}
+          canOpen={false}
         />
       </Animated.View>
       <Animated.View
@@ -143,13 +162,14 @@ const ProjectScreen = () => {
           image={projects[getNextIndex(index + 1)].image}
           author={projects[getNextIndex(index + 1)].author}
           text={projects[getNextIndex(index + 1)].text}
+          canOpen={false}
         />
       </Animated.View>
     </Container>
   );
 };
 
-export default ProjectScreen;
+export default connect(mapStateToProps)(ProjectScreen);
 
 const Container = styled.View`
   flex: 1;
