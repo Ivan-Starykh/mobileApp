@@ -7,9 +7,7 @@ import { connect } from "react-redux";
 
 // Функция mapStateToProps для получения значения action из Redux state
 function mapStateToProps(state) {
-  return {
-    action: state.action,
-  };
+  return { action: state.action };
 }
 
 // Функция, которая возвращает следующий индекс
@@ -28,6 +26,7 @@ const ProjectScreen = ({ action }) => {
   const translateY = useRef(new Animated.Value(44)).current;
   const thirdScale = useRef(new Animated.Value(0.8)).current;
   const thirdTranslateY = useRef(new Animated.Value(-50)).current;
+  const opacity = useRef(new Animated.Value(0)).current;
   const [index, setIndex] = useState(0);
   const [panResponder, setPanResponder] = useState(null);
 
@@ -61,12 +60,20 @@ const ProjectScreen = ({ action }) => {
           toValue: 44,
           useNativeDriver: false,
         }).start();
+        Animated.timing(opacity, {
+          toValue: 1,
+          useNativeDriver: false,
+        }).start();
       },
       onPanResponderMove: Animated.event([null, { dx: pan.x, dy: pan.y }], {
         useNativeDriver: false,
       }),
       onPanResponderRelease: () => {
         const positionY = pan.y.__getValue();
+        Animated.timing(opacity, {
+          toValue: 0,
+          useNativeDriver: false,
+        }).start();
         if (positionY > 200) {
           Animated.timing(pan, {
             toValue: { x: 0, y: 1000 },
@@ -77,7 +84,7 @@ const ProjectScreen = ({ action }) => {
             translateY.setValue(44);
             thirdScale.setValue(0.8);
             thirdTranslateY.setValue(-50);
-            setIndex(getNextIndex(index));
+            setIndex((prevIndex) => getNextIndex(prevIndex));
           });
         } else {
           Animated.spring(pan, {
@@ -103,12 +110,12 @@ const ProjectScreen = ({ action }) => {
         }
       },
     });
-
     setPanResponder(panResponderInstance);
   }, [action, pan, scale, translateY]);
 
   return (
     <Container>
+      <AnimatedMask style={{ opacity: opacity }} />
       <Animated.View
         style={{
           transform: [{ translateX: pan.x }, { translateY: pan.y }],
@@ -177,6 +184,18 @@ const Container = styled.View`
   align-items: center;
   background-color: #f0f3f5;
 `;
+
+const Mask = styled.View`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.25);
+  z-index: -3;
+`;
+
+const AnimatedMask = Animated.createAnimatedComponent(Mask);
 
 const Text = styled.Text`
   font-size: 20px;
