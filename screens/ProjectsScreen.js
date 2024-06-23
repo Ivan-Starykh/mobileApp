@@ -206,7 +206,7 @@ const projects = [
     title: "Price Tag",
     image: require("../assets/background5.jpg"),
     author: "Ivan Starykh",
-    text: "Thanks to me, I improved my design skill and learned to do animations for my app Price Tag, a top news app in Russia.",
+    text: "Thanks to me, I improved my design skill and learned to do animations for my app Price Tag, a top news app in Russia. Thanks to me, I improved my design skill and learned to do animations for my app Price Tag, a top news app in Russia.Thanks to me, I improved my design skill and learned to do animations for my app Price Tag, a top news app in Russia. Thanks to me, I improved my design skill and learned",
   },
   {
     title: "The DM App - Ananoumous Chat",

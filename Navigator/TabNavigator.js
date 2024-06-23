@@ -50,11 +50,6 @@ function TabNavigator({ navigation, route }) {
       })}
     >
       <Tab.Screen
-        name="Projects"
-        component={ProjectsScreen}
-        options={{ headerShown: false }}
-      />
-      <Tab.Screen
         name="Home"
         component={HomeScreen}
         options={{ headerShown: false }}
@@ -62,6 +57,11 @@ function TabNavigator({ navigation, route }) {
       <Tab.Screen
         name="Courses"
         component={CoursesScreen}
+        options={{ headerShown: false }}
+      />
+      <Tab.Screen
+        name="Projects"
+        component={ProjectsScreen}
         options={{ headerShown: false }}
       />
     </Tab.Navigator>

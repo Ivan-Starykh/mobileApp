@@ -18,6 +18,7 @@ import Avatar from "../components/Avatar";
 import { useNavigation } from "@react-navigation/native";
 import { gql, useQuery } from "@apollo/client";
 import { SafeAreaView } from "react-native-safe-area-context";
+import ModalLogin from "../components/ModalLogin";
 
 const CardsQuery = gql`
   query Cards {
@@ -224,6 +225,7 @@ function HomeScreen(props) {
           </ScrollView>
         </SafeAreaView>
       </AnimatedContainer>
+      <ModalLogin />
     </RootView>
   );
 }

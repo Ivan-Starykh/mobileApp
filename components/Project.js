@@ -9,12 +9,11 @@ import {
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { connect } from "react-redux";
+import { LinearGradient } from "expo-linear-gradient";
 
 // Функция mapStateToProps для получения значения action из Redux state
 function mapStateToProps(state) {
-  return {
-    action: state.action,
-  };
+  return { action: state.action };
 }
 
 // Функция mapDispatchToProps для отправки action в Redux store
@@ -42,6 +41,7 @@ const Project = ({
   const cardHeight = useRef(new Animated.Value(460)).current;
   const titleTop = useRef(new Animated.Value(20)).current;
   const opacity = useRef(new Animated.Value(0)).current;
+  const textHeight = useRef(new Animated.Value(100)).current;
 
   const handleOpenCard = () => {
     if (!canOpen) return;
@@ -55,6 +55,10 @@ const Project = ({
     }).start();
     Animated.spring(titleTop, { toValue: 45, useNativeDriver: false }).start();
     Animated.timing(opacity, { toValue: 1, useNativeDriver: false }).start();
+    Animated.spring(textHeight, {
+      toValue: 1000,
+      useNativeDriver: false,
+    }).start();
     StatusBar.setHidden(true);
     openCard(); // Вызов функции openCard из пропсов
   };
@@ -70,6 +74,10 @@ const Project = ({
     }).start();
     Animated.spring(titleTop, { toValue: 20, useNativeDriver: false }).start();
     Animated.timing(opacity, { toValue: 0, useNativeDriver: false }).start();
+    Animated.spring(textHeight, {
+      toValue: 100,
+      useNativeDriver: false,
+    }).start();
     StatusBar.setHidden(false);
     closeCard(); // Вызов функции closeCard из пропсов
   };
@@ -82,7 +90,16 @@ const Project = ({
           <AnimatedTitle style={{ top: titleTop }}>{title}</AnimatedTitle>
           <Author>by {author}</Author>
         </Cover>
-        <Text>{text}</Text>
+        <AnimatedText style={{ height: textHeight }}>{text}</AnimatedText>
+        <AnimatedLinearGradient
+          colors={["rgba(255,255,255,0)", "rgba(255,255,255,1)"]}
+          style={{
+            position: "absolute",
+            top: 330,
+            width: "100%",
+            height: textHeight,
+          }}
+        />
         <TouchableOpacity
           style={{ position: "absolute", top: 20, right: 20 }}
           onPress={handleCloseCard}
@@ -96,7 +113,7 @@ const Project = ({
   );
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Project); // Шаг 3: Обертка компонента connect(mapStateToProps, mapDispatchToProps)
+export default connect(mapStateToProps, mapDispatchToProps)(Project);
 
 const Container = styled.View`
   width: 315px;
@@ -146,6 +163,9 @@ const Text = styled.Text`
   line-height: 24px;
   color: #3c4560;
 `;
+
+const AnimatedText = Animated.createAnimatedComponent(Text);
+const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient);
 
 const CloseView = styled.View`
   width: 32px;
