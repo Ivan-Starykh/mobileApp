@@ -31,7 +31,7 @@ class Avatar extends React.Component {
         const picture = data.results[0].picture.large;
         const name = data.results[0].name.first;
         this.setState({ picture });
-        this.props.updateName(name);
+        // this.props.updateName(name);
       })
       .catch((error) => console.error("Error fetching data:", error));
   }

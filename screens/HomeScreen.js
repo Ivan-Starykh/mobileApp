@@ -46,6 +46,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     openMenu: () => dispatch({ type: "OPEN_MENU" }),
+    openLogin: () => dispatch({ type: "OPEN_LOGIN" }),
   };
 }
 
@@ -142,6 +143,14 @@ function HomeScreen(props) {
   if (error) console.log(`Error: ${error.message}`);
   if (data) console.log("Data received:", data);
 
+  const handleAvatar = () => {
+    if (props.name) {
+      props.openMenu();
+    } else {
+      props.openLogin();
+    }
+  };
+
   return (
     <RootView>
       <Menu />
@@ -150,7 +159,7 @@ function HomeScreen(props) {
           <ScrollView>
             <TitleBar>
               <TouchableOpacity
-                onPress={props.openMenu}
+                onPress={handleAvatar}
                 style={{ position: "absolute", top: 0, left: 0 }}
               >
                 <Avatar />

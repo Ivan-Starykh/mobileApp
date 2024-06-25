@@ -1,6 +1,9 @@
 import React from "react";
 import styled from "styled-components/native";
 import {
+  Alert,
+  Animated,
+  Dimensions,
   Keyboard,
   TouchableOpacity,
   TouchableWithoutFeedback,
@@ -8,6 +11,27 @@ import {
 import { BlurView } from "expo-blur";
 import Success from "./Success";
 import Loading from "./Loading";
+import { connect } from "react-redux";
+import { auth } from "./Firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const screenHeight = Dimensions.get("window").height;
+
+function mapStateToProps(state) {
+  return { action: state.action };
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    closeLogin: () => dispatch({ type: "CLOSE_LOGIN" }),
+    updateName: (name) =>
+      dispatch({
+        type: "UPDATE_NAME",
+        name,
+      }),
+  };
+}
 
 class ModalLogin extends React.Component {
   state = {
@@ -17,17 +41,91 @@ class ModalLogin extends React.Component {
     iconPassword: require("../assets/icon-password.png"),
     isSuccessful: false,
     isLoading: false,
+    translateY: new Animated.Value(screenHeight),
+    scale: new Animated.Value(1.3),
+    translateYModal: new Animated.Value(0),
+  };
+
+  componentDidMount() {
+    this.retrieveName();
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (this.props.action === "openLogin") {
+      Animated.timing(this.state.translateY, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+      Animated.spring(this.state.scale, {
+        toValue: 1,
+        useNativeDriver: true,
+      }).start();
+      Animated.timing(this.state.translateYModal, {
+        toValue: 0,
+        duration: 0,
+        useNativeDriver: true,
+      }).start();
+    } else if (this.props.action === "closeLogin") {
+      setTimeout(() => {
+        Animated.timing(this.state.translateY, {
+          toValue: screenHeight,
+          duration: 300,
+          useNativeDriver: true,
+        }).start();
+        Animated.spring(this.state.scale, {
+          toValue: 1.3,
+          useNativeDriver: true,
+        }).start();
+      }, 500);
+      Animated.timing(this.state.translateYModal, {
+        toValue: 1000,
+        duration: 500,
+        useNativeDriver: true,
+      }).start();
+    }
+  }
+
+  storeName = async (name) => {
+    try {
+      await AsyncStorage.setItem("name", name);
+    } catch (error) {
+      console.error("Error storing name:", error);
+    }
+  };
+
+  retrieveName = async () => {
+    try {
+      const name = await AsyncStorage.getItem("name");
+      if (name !== null) {
+        console.log(name);
+        this.props.updateName(name);
+      }
+    } catch (error) {
+      console.error("Error retrieving name:", error);
+    }
   };
 
   handleLogin = () => {
-    console.log(this.state.email, this.state.password);
-
     this.setState({ isLoading: true });
 
-    setTimeout(() => {
-      this.setState({ isLoading: false });
-      this.setState({ isSuccessful: true });
-    }, 2000);
+    const email = this.state.email;
+    const password = this.state.password;
+
+    signInWithEmailAndPassword(auth, email, password)
+      .then((response) => {
+        this.setState({ isLoading: false, isSuccessful: true });
+        Alert.alert("Поздравляю", "Вы успешно вошли в систему");
+        this.storeName(response.user.email);
+        setTimeout(() => {
+          this.props.closeLogin();
+          this.setState({ isSuccessful: false });
+        }, 1000);
+      })
+      .catch((error) => {
+        this.setState({ isLoading: false });
+        Alert.alert("Error", error.message);
+      });
   };
 
   focusEmail = () => {
@@ -46,23 +144,29 @@ class ModalLogin extends React.Component {
 
   tapBackground = () => {
     Keyboard.dismiss();
+    this.props.closeLogin();
   };
 
   render() {
     return (
-      <Container>
+      <AnimatedContainer
+        style={{ transform: [{ translateY: this.state.translateY }] }}
+      >
         <TouchableWithoutFeedback onPress={this.tapBackground}>
           <BlurView
             tint="default"
             intensity={100}
-            style={{
-              position: "absolute",
-              width: "100%",
-              height: "100%",
-            }}
+            style={{ position: "absolute", width: "100%", height: "100%" }}
           />
         </TouchableWithoutFeedback>
-        <Modal>
+        <AnimatedModal
+          style={{
+            transform: [
+              { scale: this.state.scale },
+              { translateY: this.state.translateYModal },
+            ],
+          }}
+        >
           <Logo source={require("../assets/logo-dc.png")} />
           <Text>Start Learning. Access Pro Content.</Text>
           <TextInput
@@ -84,15 +188,15 @@ class ModalLogin extends React.Component {
               <ButtonText>Log In</ButtonText>
             </Button>
           </TouchableOpacity>
-        </Modal>
+        </AnimatedModal>
         <Success isActive={this.state.isSuccessful} />
         <Loading isActive={this.state.isLoading} />
-      </Container>
+      </AnimatedContainer>
     );
   }
 }
 
-export default ModalLogin;
+export default connect(mapStateToProps, mapDispatchToProps)(ModalLogin);
 
 const Container = styled.View`
   position: absolute;
@@ -105,14 +209,18 @@ const Container = styled.View`
   align-items: center;
 `;
 
+const AnimatedContainer = Animated.createAnimatedComponent(Container);
+
 const Modal = styled.View`
   width: 335px;
   height: 370px;
-  background: white;
+  background: #fff;
   border-radius: 20px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
   align-items: center;
 `;
+
+const AnimatedModal = Animated.createAnimatedComponent(Modal);
 
 const Logo = styled.Image`
   width: 44px;
@@ -169,7 +277,7 @@ const Button = styled.View`
 `;
 
 const ButtonText = styled.Text`
-  color: white;
+  color: #fff;
   font-weight: 600;
   font-size: 20px;
   text-transform: uppercase;
