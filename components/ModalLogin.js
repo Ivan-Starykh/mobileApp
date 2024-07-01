@@ -117,6 +117,7 @@ class ModalLogin extends React.Component {
         this.setState({ isLoading: false, isSuccessful: true });
         Alert.alert("Поздравляю", "Вы успешно вошли в систему");
         this.storeName(response.user.email);
+        this.props.updateName(response.user.email);
         setTimeout(() => {
           this.props.closeLogin();
           this.setState({ isSuccessful: false });
@@ -167,7 +168,7 @@ class ModalLogin extends React.Component {
             ],
           }}
         >
-          <Logo source={require("../assets/logo-dc.png")} />
+          <Logo source={require("../assets/logo.png")} />
           <Text>Start Learning. Access Pro Content.</Text>
           <TextInput
             onChangeText={(email) => this.setState({ email })}

@@ -5,19 +5,37 @@
 ---
 [React Native](https://facebook.github.io/react-native/) is a popular Javascript framework that builds on top of React by using native components to create a real mobile app indistinguishable from one made using Xcode or Android Studio. The main difference with native development is that you get to use CSS, hot-reload, Javascript and other familiar techniques that the Web has grown over the past decades. Most importantly, you're building for both iOS and Android using the same codebase.
 
-## Course Files
-1. [React Native for Designers]()
-2. [Styled Components]()
-3. [Props and Icons]()
-4. [Static Data and Loop]()
-5. [States and Animations]()
-6. [Redux]()
-7. [Fetch API Data]()
-8. [Screens and Navigation]()
-9. [Passing Data]()
-10. [GraphQL with Contentful]()
-11. [HTML and Markdown]()
-12. [Adapting for iPad and Android]()
+[//]: # (## Course Files)
+
+[//]: # (1. [React Native for Designers]&#40;&#41;)
+
+[//]: # (2. [Styled Components]&#40;&#41;)
+
+[//]: # (3. [Props and Icons]&#40;&#41;)
+
+[//]: # (4. [Static Data and Loop]&#40;&#41;)
+
+[//]: # (5. [States and Animations]&#40;&#41;)
+
+[//]: # (6. [Redux]&#40;&#41;)
+
+[//]: # (7. [Fetch API Data]&#40;&#41;)
+
+[//]: # (8. [Screens and Navigation]&#40;&#41;)
+
+[//]: # (9. [Passing Data]&#40;&#41;)
+
+[//]: # (10. [GraphQL with Contentful]&#40;&#41;)
+
+[//]: # (11. [HTML and Markdown]&#40;&#41;)
+
+[//]: # (12. [Adapting for iPad and Android]&#40;&#41;)
+# About
+This is a cross-platform (iOS, Android) mobile application built with React Native using Expo. The project is divided into components that are reused throughout. For authentication, there is a form with email and password, which is handled through Google's Firebase. Redux is used for managing the application's data state and user interface. The backend utilizes GraphQL and the Hygraph API service. The application includes animations and utilizes Lottie, which is a JSON-based animation file format. This application can be used as a template with further modifications depending on the project.
+
+# Screenshots
+![](./screenshots.jpeg)
+---
 
 ## Install Node
 
@@ -43,7 +61,7 @@ Go to their Quick Start [guide](https://expo.io/learn) for more detailed instruc
 Go to your new project's folder and start the environment.
 ```sh
 expo start 
-или
+
 npm run ios
 npm run android
 ```
